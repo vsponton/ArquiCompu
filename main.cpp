@@ -1,9 +1,7 @@
-
-
 #include <stdio.h>
 #include <conio.h>
 #include <unistd.h>
-#include <EasyPIO.h>
+#include "EasyPIO.h"
 
 int menu(void) ;
 void autof(void) ;
@@ -97,3 +95,53 @@ void disp_binary(int i){
     } else printf("_") ;
     printf("\n") ;
 }
+
+
+//Autofantastico Algoritmo
+void AutofantasticoA(){
+  while(1){
+        initscr();
+        noecho();
+        for(int i = 1; i<=128; i=i*2) 
+        {
+            output(i);
+            delay(tiempo);
+            if(press_key() == 0){
+                echo();
+                endwin();
+                return;
+            } 
+        };
+        for(int i = 64; i>0 ; i=i/2){ 
+            output(i);
+            delay(tiempo);
+            if(press_key() == 0){
+                echo();
+                endwin();
+                return;
+            } 
+            
+        };
+    };
+};
+
+
+//Funcion Carrera hecha con tabla 
+void Carrera()
+{
+    initscr();
+    noecho();
+    while(1){
+        for (int i = 0; i<16; i++ )
+        {
+            int valor = TablaCa[i];
+            output(valor);
+            delay(tiempo);
+            if(press_key() == 0){
+                echo();
+                endwin();
+                return;
+            } 
+        };
+    };
+};
