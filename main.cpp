@@ -12,7 +12,7 @@ char letra;
 
 
 ////////////////////tablas de datos //////////////////////////////////
-unsigned char TablaAf []= {0x01, 0x02, 0x04,0x08,0x10, 0x20, 0x40, 0x80};
+//unsigned char TablaAf []= {0x01, 0x02, 0x04,0x08,0x10, 0x20, 0x40, 0x80};
 unsigned char TablaCh []= {0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x81};
 unsigned char TablaCa []= {0x01, 0x01 ,0x03, 0x03, 0x05, 0x05, 0x09, 0x09, 0x11,0x12,0x24,0x28,0x50,0x60,0x40,0x80};
 unsigned char TP[] = {0x88, 0x48, 0x28, 0x18, 0x14, 0x12, 0x12, 0x14, 0x18,0x28,0x48,0x48, 0x28,0x18,0x14,0x14,0x18,0x28,0x28,0x18,0x18,0x18};
@@ -22,11 +22,11 @@ int ingreso() ;
 int presskey() ;
 void delay(int) ;
 void autof() ;
+void ChoqueT(void) ;
 void dips_binary(int) ;
 void simulador_balizas(void) ;
 void expansion_ondas(void) ;
-void choquef(void) ;
-void choque__f(void) ;
+
 
 
 int menu(void){
@@ -51,8 +51,8 @@ int ingreso(){
     printw("Ingrese clave: ");
     for(int i=0; i<3;i++){
         char c;
-        char temp[5];
-        for(int i = 0; i < 5; i++){
+        char temp[6];
+        for(int i = 0; i < 6; i++){
             c = getch();
             temp[i] = c;
             printw("*");
@@ -219,17 +219,6 @@ void choque__f()
 
 // #define DELAY 500000 // 500000 microsegundos = 0.5 segundos
 
-void print_balizas(int balizas[]) {
-    for (int i = 0; i < 2; i++) {
-        if (balizas[i]) {
-            printf("● ");
-        } else {
-            printf("○ ");
-        }
-    }
-    printf("\n");
-}
-
 // ------------------------------------
 
 void print_balizas(int balizas[]) {
@@ -242,6 +231,7 @@ void print_balizas(int balizas[]) {
     }
     printf("\n");
 }
+
 
 void simulador_balizas(int num_cycles) {
     int balizas[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // Inicializar las luces de emergencia apagadas
@@ -278,6 +268,10 @@ void simulador_balizas(int num_cycles) {
     }
 }
 
+
+//// expansion de ondas por tabla
+
+
 void expansion_ondas(){
 
 }
@@ -290,6 +284,10 @@ int main() {
     simulador_balizas(num_cycles);
     */
 
+    pioInit();
+    strcpy(password, "123456");
+
+
     int num_cycles = 10; // Número de ciclos a ejecutar
     int choice;
     int authenticated = 0;
@@ -301,7 +299,7 @@ int main() {
                autof() ;
             break;
             case 2: 
-               carerraf() ;
+               ChoqueT() ;
             break;
             case 3: 
                simulador_balizas() ;
