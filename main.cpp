@@ -11,8 +11,17 @@ char letra;
 // int tiempo = 12;
 
 
+////////////////////tablas de datos //////////////////////////////////
+unsigned char TablaAf []= {0x01, 0x02, 0x04,0x08,0x10, 0x20, 0x40, 0x80};
+unsigned char TablaCh []= {0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x81};
+unsigned char TablaCa []= {0x01, 0x01 ,0x03, 0x03, 0x05, 0x05, 0x09, 0x09, 0x11,0x12,0x24,0x28,0x50,0x60,0x40,0x80};
+unsigned char TP[] = {0x88, 0x48, 0x28, 0x18, 0x14, 0x12, 0x12, 0x14, 0x18,0x28,0x48,0x48, 0x28,0x18,0x14,0x14,0x18,0x28,0x28,0x18,0x18,0x18};
+
 int menu(void) ;
-void autof(void) ;
+int ingreso() ;
+int presskey() ;
+void delay(int) ;
+void autof() ;
 void dips_binary(int) ;
 void simulador_balizas(void) ;
 void expansion_ondas(void) ;
@@ -132,7 +141,7 @@ void autof(){
 };
 
 
-//Autofantastico Algoritmo
+//   ------ Autofantastico Algoritmo
 void AutofantasticoA(){
   while(1){
         initscr();
@@ -160,16 +169,29 @@ void AutofantasticoA(){
     };
 };
 
-void choquef(void) {
-    printf("\nMostrando choque:\n");
-    char a;
-    unsigned char tabla[7] = {0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x81}
-    for(int i=0; i<7; i++){
-        dips_binary(tabla[i]) ;
-        leds(-tabla[i]);
-        delayMillis(300) ;
-    }
-}
+
+//////////// Algoritmo choque hecho por tabla 
+
+void ChoqueT()
+{
+    initscr();
+    noecho();
+    while(1){
+        for (int i = 0; i<8; i++ )
+        {
+            int valor = TablaCh[i];
+            output(valor);
+            delay(tiempo);
+            if(press_key() == 0){
+                echo();
+                endwin();
+                return;
+            } 
+        };
+    };
+};
+
+/*
 
 //Funcion Carrera hecha con tabla 
 void choque__f()
@@ -191,6 +213,8 @@ void choque__f()
     };
 };
 
+*/
+
 /////// balizas algoritmo
 
 // #define DELAY 500000 // 500000 microsegundos = 0.5 segundos
@@ -204,41 +228,6 @@ void print_balizas(int balizas[]) {
         }
     }
     printf("\n");
-}
-
-void simulador_balizas(int num_cycles) {
-    int balizas[2] = {0, 0}; // Inicializar las luces de emergencia apagadas
-
-    for (int cycle = 0; cycle < num_cycles; cycle++) {
-        // Alternar luces
-        balizas[0] = 1; 
-        balizas[1] = 1;
-        balizas[4] = 1; 
-        balizas[5] = 1; 
-        // Apagar luces 
-        balizas[2] = 0; 
-        balizas[3] = 0; 
-        balizas[6] = 0; 
-        balizas[7] = 0; 
-
-        print_balizas(balizas);
-        delay(18); // Esperar el retardo
-
-        // Apagar primer tanda luz
-        balizas[0] = 0; 
-        balizas[1] = 0;
-        balizas[4] = 0; 
-        balizas[5] = 0; 
-
-        // Encender segunda tanda luz
-        balizas[2] = 1; 
-        balizas[3] = 1; 
-        balizas[6] = 1; 
-        balizas[7] = 1; 
-
-        print_balizas(balizas);
-        delay(18); // Esperar el retardo
-    }
 }
 
 // ------------------------------------
@@ -287,6 +276,10 @@ void simulador_balizas(int num_cycles) {
         print_balizas(balizas);
         delay(10); // Esperar el retardo
     }
+}
+
+void expansion_ondas(){
+
 }
 
 int main() {
