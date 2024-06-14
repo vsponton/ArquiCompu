@@ -2,7 +2,6 @@
 #include <conio.h>
 #include <unistd.h>
 #include "EasyPIO.h"
-// #include <unistd.h> // Para usar la función usleep (en sistemas Unix/Linux)
 
 char password[5];
 char letra;
@@ -14,18 +13,17 @@ char letra;
 ////////////////////tablas de datos //////////////////////////////////
 //unsigned char TablaAf []= {0x01, 0x02, 0x04,0x08,0x10, 0x20, 0x40, 0x80};
 unsigned char TablaCh []= {0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x81};
-unsigned char TablaCa []= {0x01, 0x01 ,0x03, 0x03, 0x05, 0x05, 0x09, 0x09, 0x11,0x12,0x24,0x28,0x50,0x60,0x40,0x80};
-unsigned char TP[] = {0x88, 0x48, 0x28, 0x18, 0x14, 0x12, 0x12, 0x14, 0x18,0x28,0x48,0x48, 0x28,0x18,0x14,0x14,0x18,0x28,0x28,0x18,0x18,0x18};
 
+// prototipo de funciones
 int menu(void) ;
 int ingreso() ;
 int presskey() ;
 void delay(int) ;
+void dips_binary(int) ;
 void autof() ;
 void ChoqueT(void) ;
-void dips_binary(int) ;
-void simulador_balizas(void) ;
-void expansion_ondas(void) ;
+void simulador_balizas() ;
+void expansion_ondas() ;
 
 
 
@@ -93,6 +91,32 @@ int press_key() {
     nocbreak();
 }
 
+// INCLUYE MANEJO DE VELOCIDAD UP AND DOWN
+/*
+int presskey(void) {
+    #ifdef _WIN32
+    if (_kbhit()) {
+        char ch = _getch();
+        if (ch == 'a') {
+            return 0;
+        }
+        // Implementa lógica para ajustar la velocidad si es necesario
+    }
+    #else
+    nodelay(stdscr, TRUE);
+    int ch = getch();
+    if (ch == 'a') {
+        return 0;
+    } else if (ch == KEY_UP) {
+        // Implementa la lógica para aumentar la velocidad
+    } else if (ch == KEY_DOWN) {
+        // Implementa la lógica para disminuir la velocidad
+    }
+    #endif
+    return 1;
+}
+*/
+
 
 void disp_binary(int i){
     int t ;
@@ -120,7 +144,7 @@ void autof(){
         for(int i = 1; i<=128; i=i*2) 
         {
             output(i);
-            delay(tiempo);
+            delay(20);
             if(press_key() == 0){
                 echo();
                 endwin();
@@ -141,36 +165,7 @@ void autof(){
 };
 
 
-//   ------ Autofantastico Algoritmo
-void AutofantasticoA(){
-  while(1){
-        initscr();
-        noecho();
-        for(int i = 1; i<=128; i=i*2) 
-        {
-            output(i);
-            delay(20);
-            if(press_key() == 0){
-                echo();
-                endwin();
-                return;
-            } 
-        };
-        for(int i = 64; i>0 ; i=i/2){ 
-            output(i);
-            delay(20);
-            if(press_key() == 0){
-                echo();
-                endwin();
-                return;
-            } 
-            
-        };
-    };
-};
-
-
-//////////// Algoritmo choque hecho por tabla 
+////////////  choque hecho por tabla 
 
 void ChoqueT()
 {
@@ -269,11 +264,31 @@ void simulador_balizas(int num_cycles) {
 }
 
 
-//// expansion de ondas por tabla
-
+/// expansion de ondas por tabla
 
 void expansion_ondas(){
+    int numLedsEncendidos = 1;
 
+    while (numLedsEncendidos <= 8) {
+        for (int i = 0; i < 8; i++) {
+            output(TablaExpansiva[numLedsEncendidos - 1][i]);
+            delay(100);  // Ajusta el tiempo de acuerdo a tus necesidades
+        }
+
+        numLedsEncendidos++;
+    }
+}
+
+// Función para imprimir el estado de las ondas en forma gráfica
+void print_ondas(int ondas[]) {
+    for (int i = 0; i < 8; i++) {
+        if (ondas[i]) {
+            printf("● ");
+        } else {
+            printf("○ ");
+        }
+    }
+    printf("\n");
 }
 
 int main() {
@@ -322,3 +337,33 @@ int main() {
 
     return 0;
 }
+
+/*
+int main(void) {
+    pioInit();
+    strcpy(password, "1234");
+
+    int choice;
+    while ((choice = menu()) != 5) {
+   // while (choice != 5) {
+        switch (choice) {
+            case 1:
+                autof();
+                break;
+            case 2:
+                ChoqueT();
+                break;
+            case 3:
+                simulador_balizas() ;
+                break;
+            case 4:
+                expansion_ondas() ;
+                break;
+            case 5:
+                return 0;
+        }
+    }
+
+    return 0;
+}
+*/
