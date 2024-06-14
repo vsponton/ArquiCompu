@@ -899,8 +899,8 @@ short spiSendReceive16(short send) {
 /////////////////////////////////////////////////////////////////////
 
 void uartInit(int baud) {
-    uint fb = 12000000/baud; // 3 MHz UART clock
-    
+    int fb = 12000000/baud ; // 3 MHz UART clock
+
     pinMode(14, ALT0);
     pinMode(15, ALT0);
     UART_IBRD = fb >> 6;       // 6 Fract, 16 Int bits of BRD
