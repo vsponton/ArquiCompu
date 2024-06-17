@@ -1,14 +1,19 @@
-
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <ncurses.h>
+
+#ifdef _WIN32
+    #include <conio.h>
+#else
+    #include <ncurses.h>
+#endif
+
 #include "EasyPIO.h"  // Asegúrate de tener esta librería para controlar los GPIO
 
 char password[5];
 char letra;
 
-// Tabla de datos
+// tabla de datos
 unsigned char TablaCh[] = {0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x81};
 
 // Tabla para patrones de expansión de onda
@@ -23,54 +28,57 @@ unsigned char TablaExpansiva[8][8] = {
     {0xFF, 0xFE, 0xFC, 0xF8, 0xF0, 0xE0, 0xC0, 0x80}   // 8 LEDs
 };
 
-// Prototipos de funciones
-int menu(void);
-int ingreso(void);
-int presskey(void);
-void delay(int);
-void disp_binary(int);
-void autof(void);
-void ChoqueT(void);
-void simulador_balizas(void);
-void expansion_ondas(void);
 
-// Variable global para controlar la velocidad
-int speed = 10;
+// prototipo de funciones
+int menu(void) ;
+int ingreso() ;
+int presskey() ;
+void delay(int) ;
+void dips_binary(int) ;
+void autof() ;
+void ChoqueT(void) ;
+void simulador_balizas() ;
+void expansion_ondas() ;
 
 int menu(void) {
-    int opc = 0;
-    while (opc < 1 || opc > 5) {
+    int opc;
+    do {
         printf("\n--- MENU ---\n");
-        printf("1) Auto fantástico\n");
-        printf("2) Choque\n");
-        printf("3) Simulador de balizas\n");
-        printf("4) Expansión de ondas\n");
-        printf("5) Salir\n");
-        printf("Elija su opción: ");
+        printf("1) autof\n");
+        printf("2) choque\n");
+        printf("3) opcion 3\n");
+        printf("4) opcion 4\n");
+        printf("5) salir\n");
+        printf("Elija su opción:\n");
         scanf("%d", &opc);
-        if (opc < 1 || opc > 5) {
-            printf("!!!Opcion incorrecta!!!");
-        }
-    }
+    } while (opc < 1 || opc > 5);
     return opc;
 }
 
 int ingreso(void) {
+    #ifndef _WIN32
     initscr();
     noecho();
+    #endif
     printf("Ingrese clave: ");
     for (int i = 0; i < 3; i++) {
         char temp[6] = {0};
         for (int j = 0; j < 5; j++) {
+            #ifdef _WIN32
+            temp[j] = _getch();
+            #else
             temp[j] = getch();
+            #endif
             printf("*");
         }
         printf("\r                      ");
         fflush(stdout);
         if (strcmp(temp, password) == 0) {
             printf("\r");
+            #ifndef _WIN32
             echo();
             endwin();
+            #endif
             return 1;
         }
         printf("\rPrueba de nuevo: ");
@@ -79,21 +87,33 @@ int ingreso(void) {
     printf("\r                         ");
     printf("\r");
     fflush(stdout);
+    #ifndef _WIN32
     echo();
     endwin();
+    #endif
     return 0;
 }
 
 int presskey(void) {
+    #ifdef _WIN32
+    if (_kbhit()) {
+        char ch = _getch();
+        if (ch == 'a') {
+            return 0;
+        }
+        // Implementa lógica para ajustar la velocidad si es necesario
+    }
+    #else
     nodelay(stdscr, TRUE);
     int ch = getch();
     if (ch == 'a') {
         return 0;
-    } else if (ch == 'u') {
-        speed = (speed > 1) ? speed - 1 : speed; // Aumentar velocidad
-    } else if (ch == 'd') {
-        speed++; // Disminuir velocidad
+    } else if (ch == KEY_UP) {
+        // Implementa la lógica para aumentar la velocidad
+    } else if (ch == KEY_DOWN) {
+        // Implementa la lógica para disminuir la velocidad
     }
+    #endif
     return 1;
 }
 
@@ -117,23 +137,29 @@ void disp_binary(int i) {
 
 void autof(void) {
     while (1) {
+        #ifndef _WIN32
         initscr();
         noecho();
+        #endif
         for (int i = 1; i <= 128; i = i * 2) {
             //output(i);
-            delay(speed);
+            delay(10);
             if (presskey() == 0) {
+                #ifndef _WIN32
                 echo();
                 endwin();
+                #endif
                 return;
             }
         }
         for (int i = 64; i > 0; i = i / 2) {
             //output(i);
-            delay(speed);
+            delay(10);
             if (presskey() == 0) {
+                #ifndef _WIN32
                 echo();
                 endwin();
+                #endif
                 return;
             }
         }
@@ -141,16 +167,20 @@ void autof(void) {
 }
 
 void ChoqueT(void) {
+    #ifndef _WIN32
     initscr();
     noecho();
+    #endif
     while (1) {
         for (int i = 0; i < 8; i++) {
             int valor = TablaCh[i];
             //output(valor);
-            delay(speed);
+            delay(10);
             if (presskey() == 0) {
+                #ifndef _WIN32
                 echo();
                 endwin();
+                #endif
                 return;
             }
         }
@@ -168,42 +198,49 @@ void print_balizas(int balizas[]) {
     printf("\n");
 }
 
-void simulador_balizas(void) {
-    int num_cycles = 10;  // Número de ciclos a ejecutar
+
+
+// balizas algoritmo
+void simulador_balizas() {
+    int num_cycles ;
     int balizas[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // Inicializar las luces de emergencia apagadas
 
     for (int cycle = 0; cycle < num_cycles; cycle++) {
+        // Alternar luces
         // Encender luces
         balizas[0] = 1; 
         balizas[1] = 1;
         balizas[4] = 1; 
         balizas[5] = 1; 
+        // Apagar luces 
         balizas[2] = 0; 
         balizas[3] = 0; 
         balizas[6] = 0; 
         balizas[7] = 0; 
 
         print_balizas(balizas);
-        delay(speed); // Esperar el retardo
 
-        // Alternar a otro estado
+        delay(10) ; // Esperar el retardo
+
         balizas[0] = 0; 
         balizas[1] = 0;
         balizas[4] = 0; 
         balizas[5] = 0; 
+    
         balizas[2] = 1; 
         balizas[3] = 1; 
         balizas[6] = 1; 
         balizas[7] = 1; 
 
         print_balizas(balizas);
-        delay(speed); // Esperar el retardo
+        delay(10); // Esperar el retardo
     }
 }
 
-void print_ondas(unsigned char onda) {
+// Función para imprimir el estado de las ondas en forma gráfica
+void print_ondas(int ondas[]) {
     for (int i = 0; i < 8; i++) {
-        if (onda & (1 << i)) {
+        if (ondas[i]) {
             printf("● ");
         } else {
             printf("○ ");
@@ -212,53 +249,49 @@ void print_ondas(unsigned char onda) {
     printf("\n");
 }
 
-void expansion_ondas(void) {
+/// expansion de ondas por tabla
+
+void expansion_ondas(){
     int numLedsEncendidos = 1;
+
     while (numLedsEncendidos <= 8) {
         for (int i = 0; i < 8; i++) {
             print_ondas(TablaExpansiva[numLedsEncendidos - 1][i]);
-            delay(speed);  // Ajusta el tiempo de acuerdo a tus necesidades
+            delay(100);  // Ajusta el tiempo de acuerdo a tus necesidades
         }
+
         numLedsEncendidos++;
     }
 }
 
+
 int main(void) {
     pioInit();
-    strcpy(password, "12345");
+    strcpy(password, "1234");
 
-    int opc = 0;
-
-    while (opc != 5) {
-        opc = menu(); // Agregado para actualizar opc desde el menú
-        if (ingreso()) {
-            switch (opc) {
-                case 1:
-                    autof();
-                    break;
-                case 2:
-                    ChoqueT();
-                    break;
-                case 3:
-                    simulador_balizas();
-                    break;
-                case 4:
-                    expansion_ondas();
-                    break;
-                case 5:
-                    return 0;
-            }
-        } else {
-            printf("Password no válida. Aborting...\n");
-            return 1;
+    int choice;
+    while ((choice = menu()) != 5) {
+   // while (choice != 5) {
+        switch (choice) {
+            case 1:
+                autof();
+                break;
+            case 2:
+                ChoqueT();
+                break;
+            case 3:
+                simulador_balizas() ;
+                break;
+            case 4:
+                expansion_ondas() ;
+                break;
+            case 5:
+                return 0;
         }
     }
+
     return 0;
 }
-
-
-
-
 
 // #include <stdio.h>
 // #include <unistd.h>
