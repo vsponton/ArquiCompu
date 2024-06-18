@@ -4,7 +4,7 @@
 #include <ncurses.h>
 #include "EasyPIO.h"  // Asegúrate de tener esta librería para controlar los GPIO
 
-char password[5];
+char password[6];
 char letra;
 
 // Tabla de datos
@@ -55,37 +55,24 @@ int menu(void) {
 }
 
 int ingreso(void) {
-    initscr();
-    noecho();
+    
     printf("Ingrese clave: ");
-    for (int i = 0; i < 3; i++) {
+    int i = 0;
+    
+    while (i < 4 && (letra = getchar()) != '\n' ) {
+        password[i++]  = letra ;
         char temp[6] = {0};
-        for (int j = 0; j < 5; j++) {
-            temp[j] = getch();
             printf("*");
-        }
-        printf("\r                      ");
-        fflush(stdout);
-        if (strcmp(temp, password) == 0) {
-            printf("\r");
-            echo();
-            endwin();
-            return 1;
-        }
-        printf("\rPrueba de nuevo: ");
-        fflush(stdout);
     }
-    printf("\r                         ");
-    printf("\r");
-    fflush(stdout);
-    echo();
-    endwin();
-    return 0;
+    password[i] = '\0';
+    printf("\n") ;
+    
+    return strcmp(password,"12345") == 0 ;
 }
 
 int presskey(void) {
-    nodelay(stdscr, TRUE);
-    int ch = getch();
+
+    char ch = getchar();
     if (ch == 'a') {
         return 0;
     } else if (ch == 'u') {
@@ -93,6 +80,7 @@ int presskey(void) {
     } else if (ch == 'd') {
         speed++; // Disminuir velocidad
     }
+    getchar();
     return 1;
 }
 
@@ -116,23 +104,21 @@ void disp_binary(int i) {
 
 void autof(void) {
     while (1) {
-        initscr();
-        noecho();
+        
         for (int i = 1; i <= 128; i = i * 2) {
             //output(i);
             delay(speed);
+             printf("Light pattern: %d\n", i);
             if (presskey() == 0) {
-                echo();
-                endwin();
                 return;
             }
         }
         for (int i = 64; i > 0; i = i / 2) {
             //output(i);
+            
             delay(speed);
+            printf("Light pattern: %d\n", i);
             if (presskey() == 0) {
-                echo();
-                endwin();
                 return;
             }
         }
@@ -140,16 +126,14 @@ void autof(void) {
 }
 
 void ChoqueT(void) {
-    initscr();
-    noecho();
+   
     while (1) {
         for (int i = 0; i < 8; i++) {
             int valor = TablaCh[i];
             //output(valor);
+            printf("Light pattern: %d\n", valor);
             delay(speed);
             if (presskey() == 0) {
-                echo();
-                endwin();
                 return;
             }
         }
